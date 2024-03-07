@@ -246,6 +246,38 @@ app.get("/api/user/:userId", async (req, res) => {
     }
 })
 
+app.post("/api/buy-vouchers/:userId", async (req,res) => {
+    try {
+        const {userId} = req.params
+        const {voucher_price} = req.body
+
+        const result = await db.query(`
+        SELECT 
+            current_poin
+        FROM t2_user
+        WHERE id = $1
+        
+        `,[userId]);
+        
+        let tempVoucher = result.rows[0].current_poin
+
+        tempVoucher = tempVoucher - voucher_price
+
+        // Update the current_poin in the t2_user table
+        await db.query(`
+            UPDATE t2_user
+            SET current_poin = $1
+            WHERE id = $2
+        `, [tempVoucher, userId]);
+
+         // Send a success response back to the client
+         res.status(200).json({ message: "Voucher purchased successfully." });
+
+    } catch (error) {
+        throw new Error(error)
+    }
+})
+
 // get user voucher
 app.get("/api/my-vouchers/:userId", async (req, res) => {
     try {
