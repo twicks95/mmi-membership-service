@@ -196,7 +196,7 @@ app.post("/api/auth/login", async (req, res) => {
 
         // res.setHeader('Location', `http://localhost:3000/dashboard/${userData.id}`)
         // res.status(302).send(); //302 indicates found and redirect to another url
-        return res.status(200).json({ success: true, redirectURL: `${process.env.FE_HOST}/dashboard/${userData.id}` });
+        return res.status(200).json({ success: true, data: userData, redirectURL: `${process.env.FE_HOST}/dashboard/${userData.id}` });
     } catch (error) {
         return res.status(400).send(JSON.stringify({ status: 400, message: error.message }))
     }
