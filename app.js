@@ -21,7 +21,7 @@ app.use(bodyParser.json())
 // register
 app.post("/api/auth/register", async (req, res) => {
     try {
-        const { fullName, phoneNumber, idNumber, birthDate, email, password, confirmPassword } = req.body;
+        const { fullName, phoneNumber, idNumber, birthDate, email, password, confirmPassword, gender } = req.body;
         const defaultMemberTypeId = 1 // silver tier
         const defaultMemberPoint = 0
 
@@ -78,11 +78,14 @@ app.post("/api/auth/register", async (req, res) => {
                     gender, 
                     id_card, 
                     current_poin, 
-                    membership_id
+                    membership_id, 
+                    created_at,
+                    updated_at,
+                    is_deleted
                 ) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
             RETURNING id`
-            , [phoneNumber, fullName, email, password, birthDate, null, idNumber, defaultMemberPoint, defaultMemberTypeId]
+            , [phoneNumber, fullName, email, password, birthDate, gender, idNumber, defaultMemberPoint, defaultMemberTypeId, new Date(), new Date(), false]
         );
 
         // Assuming 'id' is the primary key of the users table
@@ -92,7 +95,7 @@ app.post("/api/auth/register", async (req, res) => {
         const redirectURL = `${process.env.FE_HOST}/dashboard/${userId}`;
 
         // Respond with the redirect URL
-        return res.status(201).json({ success: true, redirectURL });
+        return res.status(201).json({ success: true, data: result.rows[0], redirectURL });
     } catch (error) {
         console.error('Error registering user:', error);
         return res.status(400).send(JSON.stringify({ status: 400, message: error.message }));
